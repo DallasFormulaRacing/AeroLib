@@ -66,14 +66,14 @@ class plot_functions:
                 return raw_stats
 
 
-        def display_plot(self, data_path: list, plots: list) -> None:
+        def display_plot(self, data_path: str, x: list, y: str) -> None:
                 df = pd.DataFrame(pd.read_csv(data_path))
                 fig = make_subplots()
-                for i in plots:
+                for i in x:
                         t = go.Scatter(
-                                x=df[i[0]],
-                                y=df[i[1]],
-                                name=i[0] + " vs " + i[1],
+                                x=df[i],
+                                y=df[y],
+                                name=i + " vs " + y,
                                 mode='markers'
                         )
 
