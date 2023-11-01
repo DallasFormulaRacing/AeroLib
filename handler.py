@@ -8,18 +8,17 @@ import matplotlib
 from typing import Final
 
 class plot_functions:
-        def __init__(self, file_path1: str, file_path2: str) -> None:
+        def __init__(self, file_path1: str) -> None:
                 self.HEAVE_MIN: Final = -1.0
                 self.HEAVE_MAX: Final = 1.0
                 self.file_path1 = file_path1
-                self.file_path2 = file_path2
-                self.CHASSIS_ANGLE_MIN: Final = -1.8131
+
+                self.CHASSIS_ANGLE_MIN: Final = -1.8131 # having these hardcoded seems counterintuitive but I digress 
                 self.CHASSIS_ANGLE_MAX: Final = 0.8076
                 self.folder = "2024V3\\"
                 self.num_angles = 36
                 self.num_heaves = 36
                 self.aeromap_df = pd.DataFrame(pd.read_csv(self.file_path1, delimiter=','))
-                self.aeromap2_df = pd.DataFrame(pd.read_csv(self.file_path2, delimiter=','))
 
         
         def clean_data(self) -> pd.DataFrame:
@@ -64,23 +63,8 @@ class plot_functions:
                 raw_stats.to_csv("data/mean_max_min.csv", index=False)
 
                 return raw_stats
-
-
-        def display_plot(self, data_path: str, x: list, y: str) -> None:
-                df = pd.DataFrame(pd.read_csv(data_path))
-                fig = make_subplots()
-                for i in x:
-                        t = go.Scatter(
-                                x=df[i],
-                                y=df[y],
-                                name=i + " vs " + y,
-                                mode='markers'
-                        )
-
-                        fig.add_trace(t)
-                fig.show()
-
-
+        
+        
         def compare_min_max_mean(self) -> dict:
                 df = self.calculate_min_max_mean()
                 minComp = df.loc['Raw Downforce', 'Minimum'] - df.loc['ClA', 'Minimum']
@@ -93,7 +77,7 @@ class plot_functions:
                 }
                 return compared
         
-
+        
         def plot_yaw_angle_vs_downforce(self) -> None:
                 yaw_angle_vs_downforce = pd.DataFrame(columns=["Yaw Angle", "Downforce"])
                 yaw_angle_increment = 5
@@ -124,3 +108,22 @@ class plot_functions:
                 fig = px.scatter(yaw_angle_vs_downforce, x="Yaw Angle", y="Overturning Moment")
                 fig.show()
                 yaw_angle_vs_downforce.to_csv("data/Yaw_Angle_vs_Downforce.csv", index=False)
+        
+
+        def display_plot(self, data_path: str, x: list, y: str, to_file: bool = False) -> None:
+                df = pd.DataFrame(pd.read_csv(data_path))
+                fig = make_subplots()
+                file_name = "data/"
+                for i in x:
+                        t = go.Scatter(
+                                x=df[i],
+                                y=df[y],
+                                name=i + " vs " + y,
+                                mode='markers'
+                        )
+                        fig.add_trace(t)
+                        file_name = file_name + i + "_"
+                fig.show()
+                file_name = file_name.replace(" ", "_") + "vs_" + y + ".csv"
+                if to_file:
+                        df.to_csv(file_name, index=False)
