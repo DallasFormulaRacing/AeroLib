@@ -1,5 +1,12 @@
-from handler import plot_functions
+import plotly.graph_objects as go
+import pandas as pd
+import handler as hd
 
-plotFunc = plot_functions(file_path1="data/aerodata.csv")
+aeromap_df = pd.DataFrame(pd.read_csv('./data/aerodata.csv', delimiter=','))
 
-plotFunc.display_plot("data/aerodata.csv", ["Rear Rideheight", "Front Rideheight"], "ClA")
+plot_funcs = hd.handler(aeromap_df)
+
+z_vals = ['ClA', 'CdA', 'Raw Downforce Mean', 'Raw Drag Mean']
+
+for val in z_vals:
+    plot_funcs.make_plot_vs_front_rear_rideheight(val).show()
